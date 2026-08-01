@@ -1,102 +1,197 @@
-# AI-Powered-Smart-Contract-Auditor
+#  AI-Powered Smart Contract Auditor
 
-An AI-assisted security auditing platform for Solidity smart contracts that combines rule-based static analysis with Large Language Model (LLM) reasoning to identify vulnerabilities, explain security risks, and generate a professional audit report.
-
----
-
-## Overview
-
-Smart contracts are immutable once deployed, making security vulnerabilities extremely expensive to fix after deployment. This project automates the initial security review process by combining traditional static analysis with AI-powered semantic analysis.
-
-The application analyzes Solidity contracts, detects common vulnerabilities, assigns severity levels, recommends fixes, and generates a downloadable PDF audit report.
+An AI-powered smart contract security auditing platform that combines **Slither static analysis** with **Groq LLaMA semantic reasoning** to detect Solidity vulnerabilities, merge overlapping findings, assign confidence levels, calculate deterministic risk scores, and generate professional audit reports with actionable remediation guidance.
 
 ---
 
-## Key Features
+# 📖 Overview
 
-- Static vulnerability detection using Slither
-- AI-powered semantic analysis using Groq LLM
-- Detection of common Solidity security issues
-- Severity classification (Critical, High, Medium, Low)
-- Security recommendations with mitigation suggestions
-- Overall contract risk score
-- Professional PDF audit report generation
-- Simple web interface for uploading and analyzing contracts
+Smart contracts become **immutable once deployed**, making security vulnerabilities extremely costly to fix after deployment. Professional smart contract audits are often expensive and inaccessible for small teams or independent developers.
+
+This project automates the initial security review process by combining deterministic static analysis with AI-powered semantic reasoning to provide developers with fast, explainable, and structured security reports.
 
 ---
 
-## Workflow
+# 🚀 Key Features
+
+* Hybrid security analysis using **Slither** and **Groq LLaMA 3.3 70B**
+* Intelligent Finding Fusion Engine to merge duplicate vulnerabilities
+* Confidence assignment for every finding
+* Deterministic severity-weighted risk scoring
+* AI-generated remediation guidance
+* Explainability layer describing the security impact of every issue
+* Corrected Solidity code snippets for detected vulnerabilities
+* Professional PDF audit report generation
+* Interactive web dashboard for contract upload and visualization
+
+---
+
+# 🏗️ System Architecture
 
 ```text
-Upload Solidity Contract
-            │
-            ▼
- Static Analysis (Slither)
-            │
-            ▼
- AI Semantic Analysis (Groq LLM)
-            │
-            ▼
- Merge & Prioritize Findings
-            │
-            ▼
- Risk Score + Recommendations
-            │
-            ▼
- Generate PDF Audit Report
+                Upload Solidity Contract
+                          │
+                          ▼
+                 Slither Static Analysis
+                          │
+                          ▼
+              Parse Static Analysis Findings
+                          │
+                          ▼
+          Groq LLaMA Semantic Security Analysis
+                          │
+                          ▼
+              Hybrid Finding Fusion Engine
+        (Merge duplicate vulnerabilities)
+                          │
+                          ▼
+               Confidence Assignment Engine
+       (Very High / High / Medium Confidence)
+                          │
+                          ▼
+         Deterministic Severity Risk Calculator
+                          │
+                          ▼
+             Explainability & Fix Generation
+                          │
+                          ▼
+             Professional PDF Audit Report
+                          │
+                          ▼
+                  Interactive Web Dashboard
 ```
 
 ---
 
-## Vulnerabilities Covered
+# 🔍 Security Analysis Pipeline
 
-- Reentrancy
-- Integer Overflow / Underflow
-- Access Control Issues
-- Unchecked External Calls
-- Timestamp Dependency
-- Low-Level Calls
-- Denial of Service
-- Front-running Risks
+### 1. Static Analysis
 
----
+Slither scans the uploaded Solidity contract and detects rule-based vulnerabilities such as:
 
-## Technology Stack
-
-| Component | Technology |
-|----------|-------------|
-| Backend | FastAPI |
-| Language | Python |
-| Static Analysis | Slither |
-| AI Model | Groq LLaMA |
-| PDF Reports | ReportLab |
-| Frontend | HTML, CSS, JavaScript |
+* Reentrancy
+* Access Control
+* Timestamp Dependency
+* Unchecked External Calls
+* Integer Overflow / Underflow
+* Low-Level Calls
 
 ---
 
-## Project Structure
+### 2. AI Semantic Analysis
 
-```
-Smart-Contract-Auditor/
-│
-├── main.py
-├── parser.py
-├── llm_analyzer.py
-├── pdf_generator.py
-├── index.html
-├── vulnerable.sol
-└── README.md
-```
+Groq LLaMA performs semantic reasoning to identify vulnerabilities that traditional static analyzers may miss, including:
+
+* Business Logic Flaws
+* Missing Validation
+* Authorization Issues
+* Economic Attack Vectors
+* Flash Loan Risks
+* Unsafe Assumptions
+* Token Accounting Mistakes
 
 ---
 
-## Installation
+### 3. Hybrid Finding Fusion Engine
+
+Instead of displaying two separate reports, the system intelligently:
+
+* Merges duplicate findings
+* Normalizes vulnerability names
+* Chooses the highest severity
+* Tracks the detection source
+* Produces one consolidated vulnerability report
+
+---
+
+### 4. Confidence Engine
+
+Each vulnerability is assigned a confidence level based on its detection source.
+
+| Detection Source | Confidence  |
+| ---------------- | ----------- |
+| Slither + AI     | ⭐ Very High |
+| Slither Only     | ⭐ High      |
+| AI Only          | ⭐ Medium    |
+
+---
+
+### 5. Deterministic Risk Scoring
+
+Unlike many AI-based tools, the overall contract risk score is **not generated by the LLM**.
+
+The backend calculates the score using predefined severity weights.
+
+| Severity      | Weight |
+| ------------- | -----: |
+| Critical      |     10 |
+| High          |      7 |
+| Medium        |      4 |
+| Low           |      2 |
+| Informational |      1 |
+
+The weighted score is normalized to produce an overall **Risk Score (0–10)**.
+
+---
+
+### 6. Explainability Layer
+
+Beyond reporting vulnerabilities, the system explains:
+
+* What the vulnerability is
+* Why it matters
+* How an attacker could exploit it
+* Recommended mitigation
+* Corrected Solidity code
+
+This makes the report understandable for both developers and non-security stakeholders.
+
+---
+
+# 🛡️ Vulnerabilities Covered
+
+The system can detect or reason about:
+
+* Reentrancy
+* Integer Overflow / Underflow
+* Access Control Issues
+* Unchecked External Calls
+* Timestamp Dependency
+* Low-Level Calls
+* Front-Running
+* Denial of Service
+* Flash Loan Risks
+* Missing Input Validation
+* Business Logic Flaws
+* Authorization Issues
+* Unsafe Assumptions
+
+---
+
+# 💻 Technology Stack
+
+| Layer                | Technology                  |
+| -------------------- | --------------------------- |
+| Backend              | FastAPI                     |
+| Programming Language | Python                      |
+| Static Analysis      | Slither                     |
+| AI Model             | Groq LLaMA 3.3 70B          |
+| Merge Engine         | Custom Python Logic         |
+| Risk Engine          | Severity-Weighted Algorithm |
+| PDF Reports          | ReportLab                   |
+| Frontend             | HTML, CSS, JavaScript       |
+
+---
+
+# ⚙️ Installation
 
 ```bash
 pip install fastapi uvicorn
 pip install slither-analyzer
 pip install groq
 pip install reportlab
+pip install python-dotenv
+pip install python-multipart
 
 solc-select install 0.8.0
 solc-select use 0.8.0
@@ -104,30 +199,103 @@ solc-select use 0.8.0
 
 ---
 
-## Running the Project
+# 🔑 Environment Setup
+
+Create a `.env` file in the project root:
+
+```env
+GROQ_API_KEY=your_groq_api_key_here
+```
+
+Get a free API key from:
+
+https://console.groq.com
+
+---
+
+# ▶️ Running the Project
+
+Start the backend:
 
 ```bash
 uvicorn main:app --reload
 ```
 
-Open `index.html` in your browser and upload a Solidity contract for analysis.
+Then open:
+
+```
+index.html
+```
+
+in your browser.
 
 ---
 
-## Future Improvements
+# 📂 Project Structure
 
-- Support multiple Solidity compiler versions
-- Multi-file project auditing
-- OWASP-style security scoring
-- Historical audit report storage
-- Integration with GitHub repositories
+```text
+AI-Powered-Smart-Contract-Auditor/
+│
+├── main.py                  # FastAPI application
+├── parser.py                # Slither execution and parsing
+├── llm_analyzer.py          # Groq LLM semantic analysis
+├── merge_findings.py        # Hybrid finding fusion engine
+├── risk_calculator.py       # Deterministic risk scoring
+├── pdf_generator.py         # Professional PDF report generation
+├── index.html               # Interactive dashboard
+├── vulnerable.sol           # Sample vulnerable contract
+├── .env                     # Environment variables
+├── .gitignore
+└── README.md
+```
 
 ---
 
-## Author
+# 📊 Sample Output
 
-**Shagun Peddulwar**
+| Metric                   | Example  |
+| ------------------------ | -------- |
+| Total Findings           | 5        |
+| Overall Risk Score       | 7.3 / 10 |
+| Critical Findings        | 1        |
+| High Confidence Findings | 3        |
+| Detected by Both         | 2        |
+| AI-only Findings         | 1        |
+| Slither-only Findings    | 2        |
 
-Computer Science Engineering Student
+---
 
-Interested in AI, Machine Learning, Blockchain Security, and Backend Development.
+# 🧪 Testing
+
+The project has been evaluated using:
+
+* Custom vulnerable Solidity contracts
+* SWC Registry vulnerability examples
+* Damn Vulnerable DeFi contracts
+* Ethernaut security challenges
+
+---
+
+# ✨ Project Highlights
+
+* Hybrid security analysis combining deterministic and AI-based techniques
+* Intelligent finding fusion to eliminate duplicate reports
+* Confidence assignment for every vulnerability
+* Explainable security reports
+* Deterministic backend risk scoring
+* Automated remediation guidance with corrected Solidity code
+* Professional PDF audit generation
+
+---
+
+# 🔮 Future Enhancements
+
+* Multi-file smart contract auditing
+* GitHub repository integration
+* Hardhat and Foundry plugin support
+* Real-time auditing during development
+* Historical audit report storage
+* CI/CD pipeline integration
+* OWASP-style security scoring
+* Support for additional blockchain languages such as Vyper
+
