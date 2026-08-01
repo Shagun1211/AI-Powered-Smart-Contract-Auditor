@@ -6,32 +6,26 @@
   <title>Smart Contract Auditor</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
     body {
       background-color: #0f172a;
       color: #f1f5f9;
       font-family: monospace;
       padding: 2rem;
     }
-
     h1 { font-size: 2rem; color: #38bdf8; margin-bottom: 0.5rem; }
     h2 { color: #38bdf8; margin-bottom: 1rem; }
-
     .subtitle { color: #94a3b8; margin-bottom: 2rem; }
-
     .upload-box {
       background-color: #1e293b;
       padding: 1.5rem;
       border-radius: 8px;
       margin-bottom: 2rem;
     }
-
     input[type="file"] {
       display: block;
       margin-bottom: 1rem;
       color: #f1f5f9;
     }
-
     button {
       background-color: #38bdf8;
       color: #0f172a;
@@ -43,67 +37,48 @@
       font-size: 1rem;
       font-family: monospace;
     }
-
-    button:disabled {
-      background-color: #334155;
-      cursor: not-allowed;
-    }
-
+    button:disabled { background-color: #334155; cursor: not-allowed; }
     .cards {
       display: flex;
       gap: 1rem;
       margin-bottom: 2rem;
       flex-wrap: wrap;
     }
-
     .card {
       background-color: #1e293b;
       padding: 1rem 1.5rem;
       border-radius: 8px;
       min-width: 150px;
     }
-
-    .card-value {
-      font-size: 1.8rem;
-      font-weight: bold;
-      margin-bottom: 0.25rem;
-    }
-
+    .card-value { font-size: 1.8rem; font-weight: bold; margin-bottom: 0.25rem; }
     .card-label { color: #94a3b8; font-size: 0.85rem; }
-
     .section {
       background-color: #1e293b;
       padding: 1.5rem;
       border-radius: 8px;
       margin-bottom: 2rem;
     }
-
     .finding {
       background-color: #0f172a;
       padding: 1rem;
       border-radius: 4px;
       margin-bottom: 1rem;
     }
-
     .finding-header {
       display: flex;
       gap: 1rem;
       margin-bottom: 0.5rem;
       align-items: center;
     }
-
     .finding-name { font-weight: bold; }
-
     .badge {
       padding: 0.1rem 0.5rem;
       border-radius: 4px;
       font-size: 0.8rem;
       color: white;
     }
-
     .description { color: #94a3b8; font-size: 0.85rem; margin-bottom: 0.5rem; }
     .fix { color: #4ade80; font-size: 0.85rem; margin-bottom: 0.5rem; }
-
     pre {
       background-color: #1e293b;
       padding: 0.75rem;
@@ -114,12 +89,9 @@
       margin-top: 0.5rem;
       white-space: pre-wrap;
     }
-
     .error { color: #ef4444; margin-bottom: 1rem; }
     .summary { color: #94a3b8; margin-top: 0.5rem; }
-
     .hidden { display: none; }
-
     #loading { color: #38bdf8; margin-bottom: 1rem; }
   </style>
 </head>
@@ -128,66 +100,56 @@
   <h1>Smart Contract Auditor</h1>
   <p class="subtitle">AI-powered vulnerability detection using Slither + LLM</p>
 
-
   <div class="upload-box">
     <input type="file" id="fileInput" accept=".sol">
     <button id="auditBtn" onclick="runAudit()">Run Audit</button>
-    <button 
-        onclick="window.open('http://localhost:8000/download-report')"
-        style="margin-left: 1rem; background-color: #4ade80;">
-        Download PDF Report
+    <button
+      onclick="window.open('http://localhost:8000/download-report')"
+      style="margin-left: 1rem; background-color: #4ade80;">
+      Download PDF Report
     </button>
   </div>
 
   <div id="loading" class="hidden">Analyzing contract... please wait...</div>
   <div id="error" class="error hidden"></div>
 
-  
   <div id="results" class="hidden">
 
-
     <div class="cards">
-      <div class="card" style="border-left: 4px solid #ef4444;">
-        <div class="card-value" style="color: #ef4444;" id="totalVulns">0</div>
-        <div class="card-label">Total Vulnerabilities</div>
+      <div class="card" style="border-left:4px solid #ef4444;">
+        <div class="card-value" style="color:#ef4444" id="totalVulns">0</div>
+        <div class="card-label">Total Findings</div>
       </div>
-      <div class="card" style="border-left: 4px solid #f97316;">
-        <div class="card-value" style="color: #f97316;" id="riskScore">0</div>
+      <div class="card" style="border-left:4px solid #f97316;">
+        <div class="card-value" style="color:#f97316" id="riskScore">0</div>
         <div class="card-label">Risk Score</div>
       </div>
-      <div class="card" style="border-left: 4px solid #38bdf8;">
-        <div class="card-value" style="color: #38bdf8;" id="slitherCount">0</div>
-        <div class="card-label">Slither Findings</div>
+      <div class="card" style="border-left:4px solid #a855f7;">
+        <div class="card-value" style="color:#a855f7" id="criticalCount">0</div>
+        <div class="card-label">Critical Findings</div>
       </div>
-      <div class="card" style="border-left: 4px solid #a78bfa;">
-        <div class="card-value" style="color: #a78bfa;" id="llmCount">0</div>
-        <div class="card-label">AI Findings</div>
+      <div class="card" style="border-left:4px solid #22c55e;">
+        <div class="card-value" style="color:#22c55e" id="highConfidence">0</div>
+        <div class="card-label">High Confidence</div>
       </div>
     </div>
-
 
     <div class="section">
       <h2>Summary</h2>
       <p class="summary" id="summaryText"></p>
     </div>
 
-  
     <div class="section">
-      <h2>Slither Findings</h2>
-      <div id="slitherFindings"></div>
-    </div>
-
-    <div class="section">
-      <h2 style="color: #a78bfa;">AI Analysis</h2>
-      <div id="llmFindings"></div>
+      <h2>Merged Security Findings</h2>
+      <div id="mergedFindings"></div>
     </div>
 
   </div>
 
   <script>
     const severityColors = {
-      "High": "#ef4444",
       "Critical": "#7f1d1d",
+      "High": "#ef4444",
       "Medium": "#f97316",
       "Low": "#eab308",
       "Informational": "#3b82f6"
@@ -220,7 +182,8 @@
         displayResults(data);
 
       } catch (err) {
-        document.getElementById("error").textContent = "Audit failed. Make sure backend is running.";
+        document.getElementById("error").textContent =
+          "Audit failed. Make sure backend is running.";
         document.getElementById("error").classList.remove("hidden");
       } finally {
         document.getElementById("loading").classList.add("hidden");
@@ -229,51 +192,51 @@
     }
 
     function displayResults(data) {
-      
+      document.getElementById("results").classList.remove("hidden");
       document.getElementById("totalVulns").textContent = data.total_vulnerabilities;
       document.getElementById("riskScore").textContent = data.risk_score + "/10";
-      document.getElementById("slitherCount").textContent = data.slither_findings.length;
-      document.getElementById("llmCount").textContent = data.llm_analysis.additional_vulnerabilities.length;
       document.getElementById("summaryText").textContent = data.summary;
 
+      const merged = data.merged_findings;
+      let critical = 0;
+      let highConfidence = 0;
 
-      const slitherDiv = document.getElementById("slitherFindings");
-      slitherDiv.innerHTML = "";
-      data.slither_findings.forEach(finding => {
-        slitherDiv.innerHTML += `
-          <div class="finding" style="border-left: 4px solid ${severityColors[finding.severity] || '#94a3b8'}">
+      const findingsDiv = document.getElementById("mergedFindings");
+      findingsDiv.innerHTML = "";
+
+      merged.forEach(finding => {
+        if (finding.severity === "Critical") critical++;
+        if (finding.confidence === "Very High" || finding.confidence === "High")
+          highConfidence++;
+
+        findingsDiv.innerHTML += `
+          <div class="finding"
+            style="border-left:4px solid ${severityColors[finding.severity] || "#64748b"}">
             <div class="finding-header">
-              <span class="finding-name">${finding.detector}</span>
-              <span class="badge" style="background-color: ${severityColors[finding.severity] || '#94a3b8'}">
+              <span class="finding-name">${finding.name}</span>
+              <span class="badge"
+                style="background:${severityColors[finding.severity] || "#64748b"}">
                 ${finding.severity}
               </span>
-              <span style="color: #64748b; font-size: 0.8rem;">Confidence: ${finding.confidence}</span>
-            </div>
-            <p class="description">${finding.description}</p>
-          </div>
-        `;
-      });
-
-
-      const llmDiv = document.getElementById("llmFindings");
-      llmDiv.innerHTML = "";
-      data.llm_analysis.additional_vulnerabilities.forEach(vuln => {
-        llmDiv.innerHTML += `
-          <div class="finding" style="border-left: 4px solid ${severityColors[vuln.severity] || '#94a3b8'}">
-            <div class="finding-header">
-              <span class="finding-name">${vuln.name}</span>
-              <span class="badge" style="background-color: ${severityColors[vuln.severity] || '#94a3b8'}">
-                ${vuln.severity}
+              <span style="color:#64748b; font-size:0.8rem;">
+                Confidence: ${finding.confidence}
+              </span>
+              <span style="color:#94a3b8; font-size:0.8rem;">
+                Detected by: ${finding.detected_by.join(", ")}
               </span>
             </div>
-            <p class="description">${vuln.description}</p>
-            <p class="fix">Fix: ${vuln.fix}</p>
-            <pre>${vuln.fixed_code}</pre>
+            <p class="description">${finding.description}</p>
+            <p style="color:#facc15; font-size:0.85rem; margin-top:8px;">
+              <b>Why this matters:</b> ${finding.why_this_matters}
+            </p>
+            <p class="fix"><b>Recommendation:</b> ${finding.fix}</p>
+            <pre>${finding.fixed_code}</pre>
           </div>
         `;
       });
 
-      document.getElementById("results").classList.remove("hidden");
+      document.getElementById("criticalCount").textContent = critical;
+      document.getElementById("highConfidence").textContent = highConfidence;
     }
   </script>
 

@@ -1,84 +1,165 @@
 import os
+import json
 from dotenv import load_dotenv
 from groq import Groq
 
 load_dotenv()
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))-
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+
+def clean_json(text: str) -> str:
+    """
+    Removes markdown code fences from LLM responses.
+    """
+
+    text = text.strip()
+
+    if text.startswith("```json"):
+        text = text[7:]
+
+    if text.startswith("```"):
+        text = text[3:]
+
+    if text.endswith("```"):
+        text = text[:-3]
+
+    return text.strip()
+
 
 def analyze_with_llm(contract_code, slither_findings):
-    
+    """
+    Performs semantic security analysis using Groq LLaMA.
+
+    Returns:
+        dict
+        {
+            "additional_vulnerabilities": [...]
+        }
+    """
+
     findings_text = ""
-    for f in slither_findings:
-        findings_text += f"- {f['detector']} (Severity: {f['severity']}): {f['description']}\n"
-    
-    prompt = f"""You are an expert smart contract security auditor.
 
-Analyze this Solidity smart contract for security vulnerabilities.
+    if slither_findings:
+        for finding in slither_findings:
+            findings_text += (
+                f"- {finding['detector']} "
+                f"(Severity: {finding['severity']}): "
+                f"{finding['description']}\n"
+            )
+    else:
+        findings_text = "No vulnerabilities detected by Slither."
 
-Slither static analysis already found these issues:
+    prompt = f"""
+You are an expert Solidity Smart Contract Security Auditor.
+
+Your objective is to perform semantic security analysis.
+
+IMPORTANT:
+
+Slither has already analyzed this contract and reported:
+
 {findings_text}
 
-Now analyze the contract for additional vulnerabilities that static analysis may have missed, especially:
+Your responsibilities:
+
+1. Review Slither's findings.
+2. Do NOT repeat vulnerabilities already detected.
+3. Identify ONLY additional vulnerabilities that static analysis may miss.
+
+Focus especially on:
+
 - Business logic flaws
-- Access control issues
+- Missing validation
+- Access control mistakes
+- Flash loan attack possibilities
 - Economic attack vectors
-- Any other security concerns
+- Privilege escalation
+- Unsafe assumptions
+- Token accounting mistakes
+- Authorization issues
+- Any semantic vulnerability
 
-Contract code:
-{contract_code}
+For every vulnerability provide:
 
-Respond in this exact JSON format:
+- name
+- severity
+- description
+- why_this_matters
+Explain in simple English how an attacker could exploit this issue and what business impact it could have.
+- location
+- fix
+- fixed_code
+
+Return ONLY valid JSON.
+
+Required JSON format:
+
 {{
     "additional_vulnerabilities": [
         {{
-            "name": "vulnerability name",
-            "severity": "Critical/High/Medium/Low",
-            "description": "what the vulnerability is",
-            "location": "which function or line",
-            "fix": "how to fix it",
-            "fixed_code": "corrected solidity code snippet"
+            "name": "",
+            "severity": "",
+            "description": "",
+            "why_this_matters":"",
+            "location": "",
+            "fix": "",
+            "fixed_code": ""
         }}
-    ],
-    "overall_risk_score": "score out of 10",
-    "summary": "2-3 line overall assessment"
+    ]
 }}
 
-Return only valid JSON, no extra text."""
+Do not return markdown.
 
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.1
-    )
-    
-    text = response.choices[0].message.content.strip()
-    if text.startswith("```json"):
-        text = text[7:]
-    if text.startswith("```"):
-        text = text[3:]
-    if text.endswith("```"):
-        text = text[:-3]
-    
-    return text.strip()
+Do not explain anything outside JSON.
 
-# Test it
-with open("vulnerable.sol", "r") as f:
-    contract_code = f.read()
+Contract:
 
-from parser import run_slither, parse_vulnerabilities
-slither_output = run_slither("vulnerable.sol")
-findings = parse_vulnerabilities(slither_output)
+{contract_code}
+"""
 
-llm_result = analyze_with_llm(contract_code, findings)
-print(llm_result)
+    try:
 
-try:
-    parsed = json.loads(llm_result)
-    print("\nJSON is valid")
-    print(f"Risk Score: {parsed['overall_risk_score']}")
-    print(f"Summary: {parsed['summary']}")
-    print(f"Additional vulnerabilities found: {len(parsed['additional_vulnerabilities'])}")
-except json.JSONDecodeError as e:
-    print(f"JSON parsing error: {e}")
-    print("Raw response:", llm_result)
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0
+        )
+
+        text = response.choices[0].message.content
+
+        cleaned = clean_json(text)
+
+        return json.loads(cleaned)
+
+    except Exception as e:
+
+        print(f"[LLM ERROR] {e}")
+
+        return {
+            "additional_vulnerabilities": [],
+            "status": "error",
+            "message": str(e)
+        }
+
+if __name__ == "__main__":
+
+    from parser import run_slither, parse_vulnerabilities
+
+    CONTRACT_PATH = "vulnerable.sol"
+
+    with open(CONTRACT_PATH, "r") as file:
+        contract = file.read()
+
+    slither_output = run_slither(CONTRACT_PATH)
+
+    slither_findings = parse_vulnerabilities(slither_output)
+
+    result = analyze_with_llm(contract, slither_findings)
+
+    print(json.dumps(result, indent=4))

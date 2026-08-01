@@ -33,14 +33,13 @@ def parse_vulnerabilities(slither_output):
     
     return vulnerabilities
 
-# Run it
-output = run_slither("vulnerable.sol")
-vulns = parse_vulnerabilities(output)
-
-for v in vulns:
-    print(f"Detector: {v['detector']}")
-    print(f"Severity: {v['severity']}")
-    print(f"Confidence: {v['confidence']}")
-    print(f"Description: {v['description']}")
-    print(f"Reference: {v['reference']}")
-    print("---")
+if __name__ == "__main__":
+    output = run_slither("vulnerable.sol")
+    vulns = parse_vulnerabilities(output)
+    for v in vulns:
+        print(f"Detector: {v['detector']}")
+        print(f"Severity: {v['severity']}")
+        print(f"Confidence: {v['confidence']}")
+        print(f"Description: {v['description']}")
+        print(f"Reference: {v['reference']}")
+        print("---")
